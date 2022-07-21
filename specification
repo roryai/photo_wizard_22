@@ -1,0 +1,16 @@
+2022 photo wizard specification
+
+Create list of names and file sizes in target dir
+Create list of names and file sizes in destination dir
+Remove duplicates from first list
+Copy remaining files to appropriate year dir
+
+
+Nice to haves
+
+Add multiple directories
+Recursively look through child directories
+Log duplicate files
+Log copied files
+Change ctime on mac. How? Check logs?
+Delete month directories, keeping everything in year directories
