@@ -8,7 +8,9 @@ Copy remaining files to appropriate year dir
 A duplicate is a file with the same size and same name
 Add renaming behaviour for name clashes where size is different
 How to check all target dir files for duplicates?
-
+Take command line input
+Terminal output
+Preserve ctime on mac
 
 
 Nice to haves

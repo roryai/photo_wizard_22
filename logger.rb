@@ -4,17 +4,16 @@ class Logger
 
   attr_accessor :target_dir, :source_dir, :file_name
 
-  def initialize(target_dir:, source_dir: "", file_name:)
+  def initialize(target_dir:, source_dir:)
     @target_dir = target_dir
     @source_dir = source_dir
-    @file_name = file_name
   end
 
-  def log_already_exists
+  def log_already_exists(file_name)
     append("File " + file_name + " already exists in " + target_dir + "\n")
   end
 
-  def log_success
+  def log_success(file_name)
     append("Copied " + source_dir + "/" + file_name + " to " + target_dir + "/" + file_name + "\n")
   end
 

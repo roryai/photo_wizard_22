@@ -8,6 +8,12 @@ class Wizard
   SOURCE_DIR = "/Users/rory/code/transfer_wizard_22/spec/test_photos/source"
   TARGET_DIR = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target"
 
+  attr_reader :logger
+
+  def initialize
+    @logger = Logger.new(target_dir: TARGET_DIR,source_dir: SOURCE_DIR)
+  end
+
   def scan
     Dir.chdir(SOURCE_DIR)
     records = []
@@ -25,22 +31,15 @@ class Wizard
 
   def transfer
     scan.each do |record|
-      logger = Logger.new(
-        target_dir: TARGET_DIR,
-        source_dir: SOURCE_DIR,
-        file_name: record.name
-      )
+      file_name = record.name
 
-      if File.exist?(TARGET_DIR + "/" + record.name)
-        logger.log_already_exists
+      if duplicate?(record)
         next
       end
 
       FileUtils.cp(record.source_path, TARGET_DIR)
 
-      if File.exist?(TARGET_DIR + "/" + record.name)
-        logger.log_success
-      end
+      logger.log_success(file_name) if file_exists?(file_name)
     end
   end
 
@@ -54,5 +53,24 @@ class Wizard
     end
 
     filtered_file_names
+  end
+
+  def duplicate?(record)
+    if file_exists?(record.name)
+      if File.size(TARGET_DIR + "/" + record.name) == record.size
+        logger.log_already_exists(record.name)
+
+        return true
+      else
+        base_name = File.basename(record.source_path, File.extname(record.source_path))
+        new_name = TARGET_DIR + "/" + base_name + "_001" + File.extname(record.source_path)
+        FileUtils.cp(record.source_path, new_name)
+      end
+    end
+    false
+  end
+
+  def file_exists?(file_name)
+    File.exist?(TARGET_DIR + "/" + file_name)
   end
 end

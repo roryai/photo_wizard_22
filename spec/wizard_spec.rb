@@ -10,7 +10,7 @@ RSpec.describe do
   photo_1_target_path = target_directory + "/" + photo_1
   log_file = target_directory + "/" + "file_wizard_log.txt"
 
-  before(:each) do
+  after(:each) do
     Dir.chdir(target_directory)
     Dir.children(target_directory).each do |file|
       File.delete(file)
@@ -54,6 +54,16 @@ RSpec.describe do
       Dir.chdir(target_directory)
 
       expect(Dir.exist?("empty_dir")).to be false
+    end
+
+    it "appends a number to a file with a name clash where sizes are different" do
+      Dir.chdir(target_directory)
+      File.new(photo_1, "w")
+      Wizard.new.transfer
+      Dir.chdir(target_directory)
+
+      expect(File.exist?("small_cat_001.jpg")).to be true
+      expect(File.size?("small_cat_001.jpg")).to eq (File.size?(photo_1_source_path))
     end
   end
 
