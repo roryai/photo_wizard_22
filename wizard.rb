@@ -1,12 +1,12 @@
 require 'fileutils'
 require 'pry'
 require './file_record.rb'
+require './logger.rb'
 
 class Wizard
 
   SOURCE_DIR = "/Users/rory/code/transfer_wizard_22/spec/test_photos/source"
   TARGET_DIR = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target"
-  LOG_DIR = TARGET_DIR + "/" + "file_wizard_log.txt"
 
   def scan
     Dir.chdir(SOURCE_DIR)
@@ -25,15 +25,21 @@ class Wizard
 
   def transfer
     scan.each do |record|
+      logger = Logger.new(
+        target_dir: TARGET_DIR,
+        source_dir: SOURCE_DIR,
+        file_name: record.name
+      )
+
       if File.exist?(TARGET_DIR + "/" + record.name)
-        log_already_exists(record.name)
+        logger.log_already_exists
         next
       end
 
-      FileUtils.cp(record.path, TARGET_DIR)
+      FileUtils.cp(record.source_path, TARGET_DIR)
 
       if File.exist?(TARGET_DIR + "/" + record.name)
-        log_success(record.name)
+        logger.log_success
       end
     end
   end
@@ -48,17 +54,5 @@ class Wizard
     end
 
     filtered_file_names
-  end
-
-  def log_already_exists(file_name)
-    File.open(LOG_DIR, "a+") do |file|
-      file.write("File " + file_name + " already exists in " + TARGET_DIR + "\n")
-    end
-  end
-
-  def log_success(file_name)
-    File.open(LOG_DIR, "a+") do |file|
-      file.write("Copied " + SOURCE_DIR + "/" + file_name + " to " + TARGET_DIR + "/" + file_name + "\n")
-    end
   end
 end

@@ -26,7 +26,7 @@ RSpec.describe do
     end
 
     it "adds file path source of photo to record" do
-      expect(Wizard.new.scan.first.path).to eq source_directory + "/" + photo_1
+      expect(Wizard.new.scan.first.source_path).to eq source_directory + "/" + photo_1
     end
 
     it "adds file size to record" do
@@ -58,7 +58,7 @@ RSpec.describe do
   end
 
   describe "logging" do
-    it "creates a log entry for a file that alread exists in target dir" do
+    it "creates a duplicate log entry for a file that already exists" do
       Wizard.new.transfer
       Wizard.new.transfer
 
