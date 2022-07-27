@@ -11,11 +11,11 @@ class Wizard
   attr_reader :logger
 
   def initialize
-    @logger = Logger.new(target_dir: TARGET_DIR,source_dir: SOURCE_DIR)
+    @logger = Logger.new(target_dir: TARGET_DIR, source_dir: SOURCE_DIR)
   end
 
   def scan
-    Dir.chdir(SOURCE_DIR)
+    Dir.chdir(SOURCE_DIR) #why is this here?
     records = []
 
     filter(Dir.children(SOURCE_DIR)).each do |f|
@@ -34,10 +34,14 @@ class Wizard
       file_name = record.name
 
       if duplicate?(record)
+        logger.log_already_exists(record.name)
         next
+      elsif name_clash?(record)
+        new_path = generate_unique_path(record)
+        FileUtils.cp(record.source_path, new_path)
+      else
+        FileUtils.cp(record.source_path, TARGET_DIR)
       end
-
-      FileUtils.cp(record.source_path, TARGET_DIR)
 
       logger.log_success(file_name) if file_exists?(file_name)
     end
@@ -56,21 +60,35 @@ class Wizard
   end
 
   def duplicate?(record)
-    if file_exists?(record.name)
-      if File.size(TARGET_DIR + "/" + record.name) == record.size
-        logger.log_already_exists(record.name)
+    file_exists?(record.name) && file_same_size?(record)
+  end
 
-        return true
-      else
-        base_name = File.basename(record.source_path, File.extname(record.source_path))
-        new_name = TARGET_DIR + "/" + base_name + "_001" + File.extname(record.source_path)
-        FileUtils.cp(record.source_path, new_name)
-      end
-    end
-    false
+  def name_clash?(record)
+    file_exists?(record.name) && !file_same_size?(record)
   end
 
   def file_exists?(file_name)
     File.exist?(TARGET_DIR + "/" + file_name)
+  end
+
+  def file_same_size?(record)
+    File.size(TARGET_DIR + "/" + record.name) == record.size
+  end
+
+  def increment(name)
+    extension = File.extname(name)
+    base_name = File.basename(name, ".*")
+    number = /\d*$/.match(base_name).to_s
+    name_no_num = base_name.chomp(number).chomp("_")
+
+    name_no_num + "_" + (number.to_i + 1).to_s + extension
+  end
+
+  def generate_unique_path(record)
+    new_name = record.name
+    while file_exists?(new_name) do
+        new_name = increment(new_name)
+    end
+    TARGET_DIR + "/" + new_name
   end
 end

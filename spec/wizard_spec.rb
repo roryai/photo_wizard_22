@@ -56,19 +56,35 @@ RSpec.describe do
       expect(Dir.exist?("empty_dir")).to be false
     end
 
-    it "appends a number to a file with a name clash where sizes are different" do
+    it "creates new name for files where name in use but size different" do
       Dir.chdir(target_directory)
       File.new(photo_1, "w")
       Wizard.new.transfer
       Dir.chdir(target_directory)
 
-      expect(File.exist?("small_cat_001.jpg")).to be true
-      expect(File.size?("small_cat_001.jpg")).to eq (File.size?(photo_1_source_path))
+      expect(File.exist?("small_cat_1.jpg")).to be true
+      expect(File.size?("small_cat_1.jpg"))
+        .to eq (File.size?(photo_1_source_path))
+    end
+
+    it "creates new name for files where generated file name already in use" do
+      Dir.chdir(target_directory)
+      File.new(photo_1, "w")
+      File.new("small_cat_1.jpg", "w")
+      File.new("small_cat_2.jpg", "w")
+      File.new("small_cat_3.jpg", "w")
+      File.new("small_cat_4.jpg", "w")
+      Wizard.new.transfer
+      Dir.chdir(target_directory)
+
+      expect(File.exist?("small_cat_5.jpg")).to be true
+      expect(File.size?("small_cat_5.jpg"))
+        .to eq (File.size?(photo_1_source_path))
     end
   end
 
   describe "logging" do
-    it "creates a duplicate log entry for a file that already exists" do
+    it "logs a duplicate for a file that already exists" do
       Wizard.new.transfer
       Wizard.new.transfer
 
@@ -78,12 +94,14 @@ RSpec.describe do
       expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n" + "File " + photo_1 + " already exists in " + target_directory + "\n"
     end
 
-    it "creates a log entry for a transferred file" do
+    it "logs a success for a transferred file" do
       Wizard.new.transfer
       Dir.chdir(target_directory)
       log = File.open(log_file, &:readline)
 
       expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n"
     end
+
+    xit "logs a failure if the file is not copied"
   end
 end
