@@ -2,29 +2,22 @@ class Logger
 
   LOG_FILE_NAME = "/file_wizard_log.txt"
 
-  attr_accessor :target_dir, :source_dir
-
-  def initialize(target_dir:, source_dir:)
-    @target_dir = target_dir
-    @source_dir = source_dir
+  def log_already_exists(record)
+    append("File " + record.name + " already exists at " + record.target_path + "\n", record)
   end
 
-  def log_already_exists(file_name)
-    append("File " + file_name + " already exists in " + target_dir + "\n")
+  def log_success(record)
+    append("Copied " + record.source_path + " to " + record.target_path + "\n", record)
   end
 
-  def log_success(file_name)
-    append("Copied " + source_dir + "/" + file_name + " to " + target_dir + "/" + file_name + "\n")
-  end
-
-  def log_failure(file_name)
-    append("Failed to copy " + source_dir + "/" + file_name + " to " + target_dir + "/" + file_name + "\n")
+  def log_failure(record)
+    append("Failed to copy " + record.source_path + " to " + record.target_path + "\n", record)
   end
 
   private
 
-  def append(message)
-    File.open(target_dir + LOG_FILE_NAME, "a+") do |file|
+  def append(message, record)
+    File.open(record.target_dir + LOG_FILE_NAME, "a+") do |file|
       file.write(message)
     end
   end

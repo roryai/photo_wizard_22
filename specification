@@ -5,8 +5,6 @@ Create list of names and file sizes in destination dir
 Remove duplicates from first list
 Copy remaining files to appropriate year dir
 
-A duplicate is a file with the same size and same name
-Add renaming behaviour for name clashes where size is different
 How to check all target dir files for duplicates?
 Take command line input
 Terminal output

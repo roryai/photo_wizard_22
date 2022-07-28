@@ -11,22 +11,7 @@ class Wizard
   attr_reader :logger
 
   def initialize
-    @logger = Logger.new(target_dir: TARGET_DIR, source_dir: SOURCE_DIR)
-  end
-
-  def scan
-    Dir.chdir(SOURCE_DIR) #why is this here?
-    records = []
-
-    filter(Dir.children(SOURCE_DIR)).each do |f|
-      records << FileRecord.new(
-        File.basename(f),
-        File.absolute_path(f),
-        File.size(f)
-      )
-    end
-
-    records
+    @logger = Logger.new()
   end
 
   def transfer
@@ -34,20 +19,36 @@ class Wizard
       file_name = record.name
 
       if duplicate?(record)
-        logger.log_already_exists(record.name)
+        logger.log_already_exists(record)
         next
       elsif name_clash?(record)
         new_path = generate_unique_path(record)
         FileUtils.cp(record.source_path, new_path)
       else
-        FileUtils.cp(record.source_path, TARGET_DIR)
+        FileUtils.cp(record.source_path, record.target_path)
       end
 
-      log_result(file_name)
+      log_result(record)
     end
   end
 
   private
+
+  def scan
+    Dir.chdir(SOURCE_DIR) # why is this here?
+    records = []
+
+    filter(Dir.children(SOURCE_DIR)).each do |f|
+      records << FileRecord.new(
+        name: File.basename(f),
+        source_path: File.absolute_path(f),
+        target_dir: TARGET_DIR,
+        size: File.size(f)
+      )
+    end
+
+    records
+  end
 
   def filter(file_names)
     filtered_file_names = []
@@ -60,19 +61,27 @@ class Wizard
   end
 
   def duplicate?(record)
-    file_exists?(record.name) && file_same_size?(record)
+    file_exists?(record) && file_same_size?(record)
   end
 
   def name_clash?(record)
-    file_exists?(record.name) && !file_same_size?(record)
+    file_exists?(record) && !file_same_size?(record)
   end
 
-  def file_exists?(file_name)
-    File.exist?(TARGET_DIR + "/" + file_name)
+  def file_exists?(record)
+    File.exist?(record.target_path)
   end
 
   def file_same_size?(record)
-    File.size(TARGET_DIR + "/" + record.name) == record.size
+    File.size(record.target_path) == record.size
+  end
+
+  def generate_unique_path(record)
+    new_name = record.name
+    while File.exist?(record.target_dir + "/" + new_name) do
+        new_name = increment(new_name)
+    end
+    record.target_dir + "/" + new_name
   end
 
   def increment(name)
@@ -84,19 +93,11 @@ class Wizard
     name_no_num + "_" + (number.to_i + 1).to_s + extension
   end
 
-  def generate_unique_path(record)
-    new_name = record.name
-    while file_exists?(new_name) do
-        new_name = increment(new_name)
-    end
-    TARGET_DIR + "/" + new_name
-  end
-
-  def log_result(file_name)
-    if file_exists?(file_name)
-      logger.log_success(file_name)
+  def log_result(record)
+    if file_exists?(record)
+      logger.log_success(record)
     else
-      logger.log_failure(file_name)
+      logger.log_failure(record)
     end
   end
 end

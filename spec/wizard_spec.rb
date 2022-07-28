@@ -20,20 +20,6 @@ RSpec.describe do
     File.open(log_file, "w") # wipe_log_file
   end
 
-  describe "records" do
-    it "adds file name to record" do
-      expect(Wizard.new.scan.first.name).to eq photo_1
-    end
-
-    it "adds file path source of photo to record" do
-      expect(Wizard.new.scan.first.source_path).to eq source_directory + "/" + photo_1
-    end
-
-    it "adds file size to record" do
-      expect(Wizard.new.scan.first.size).to eq 12429
-    end
-  end
-
   describe "transfers" do
     it "copies a jpg to the source directory" do
       Wizard.new.transfer
@@ -91,7 +77,7 @@ RSpec.describe do
       Dir.chdir(target_directory)
       log = File.open(log_file).read
 
-      expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n" + "File " + photo_1 + " already exists in " + target_directory + "\n"
+      expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n" + "File " + photo_1 + " already exists at " + target_directory + "/" + photo_1 + "\n"
     end
 
     it "logs a success for a transferred file" do
