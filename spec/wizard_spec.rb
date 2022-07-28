@@ -102,6 +102,5 @@ RSpec.describe do
       expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n"
     end
 
-    xit "logs a failure if the file is not copied"
   end
 end

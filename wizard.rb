@@ -43,7 +43,7 @@ class Wizard
         FileUtils.cp(record.source_path, TARGET_DIR)
       end
 
-      logger.log_success(file_name) if file_exists?(file_name)
+      log_result(file_name)
     end
   end
 
@@ -90,5 +90,13 @@ class Wizard
         new_name = increment(new_name)
     end
     TARGET_DIR + "/" + new_name
+  end
+
+  def log_result(file_name)
+    if file_exists?(file_name)
+      logger.log_success(file_name)
+    else
+      logger.log_failure(file_name)
+    end
   end
 end

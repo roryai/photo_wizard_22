@@ -1,8 +1,8 @@
 class Logger
 
-  LOG_DIR = "/file_wizard_log.txt"
+  LOG_FILE_NAME = "/file_wizard_log.txt"
 
-  attr_accessor :target_dir, :source_dir, :file_name
+  attr_accessor :target_dir, :source_dir
 
   def initialize(target_dir:, source_dir:)
     @target_dir = target_dir
@@ -17,10 +17,14 @@ class Logger
     append("Copied " + source_dir + "/" + file_name + " to " + target_dir + "/" + file_name + "\n")
   end
 
+  def log_failure(file_name)
+    append("Failed to copy " + source_dir + "/" + file_name + " to " + target_dir + "/" + file_name + "\n")
+  end
+
   private
 
   def append(message)
-    File.open(target_dir + LOG_DIR, "a+") do |file|
+    File.open(target_dir + LOG_FILE_NAME, "a+") do |file|
       file.write(message)
     end
   end
