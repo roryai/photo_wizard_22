@@ -87,6 +87,21 @@ RSpec.describe do
 
       expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n"
     end
+  end
 
+  describe "extensions" do
+    it "generates a list and count of file extensions for files in source directory" do
+      Dir.chdir(target_directory)
+      File.new("test.jpg", "w")
+      File.new("test.heic", "w")
+      File.new("test_2.heic", "w")
+      File.new("test.mov", "w")
+      File.new("test.custom", "w")
+      File.new("test", "w")
+      extensions = Wizard.new.list_extensions
+
+      expect(extensions).to include([".jpg", 1], [".heic", 2], [".mov", 1], [".custom", 1], ["", 1])
+      expect(extensions.length).to eq 5
+    end
   end
 end

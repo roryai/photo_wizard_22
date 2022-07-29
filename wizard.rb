@@ -32,10 +32,31 @@ class Wizard
     end
   end
 
+  def list_extensions
+    files = Dir.children(TARGET_DIR)
+    extension_list = [[".heic", 0]]
+
+    files.each do |f|
+      ext = File.extname(f)
+      extension_exists = extension_list.map do |record|
+        record[0] == ext
+      end[0]
+
+      extension_list << [ext, 0] unless extension_exists || ext == ".txt"
+
+      extension_list.each do |record|
+        record[1] += 1 if record[0] == ext
+      end
+    end
+
+    extension_list
+  end
+
+
   private
 
   def scan
-    Dir.chdir(SOURCE_DIR) # why is this here?
+    Dir.chdir(SOURCE_DIR)
     records = []
 
     filter(Dir.children(SOURCE_DIR)).each do |f|
@@ -86,9 +107,9 @@ class Wizard
 
   def increment(name)
     extension = File.extname(name)
-    base_name = File.basename(name, ".*")
-    number = /\d*$/.match(base_name).to_s
-    name_no_num = base_name.chomp(number).chomp("_")
+    name_no_ext = File.basename(name, ".*")
+    number = /\d*$/.match(name_no_ext).to_s
+    name_no_num = name_no_ext.chomp(number).chomp("_")
 
     name_no_num + "_" + (number.to_i + 1).to_s + extension
   end
