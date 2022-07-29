@@ -71,13 +71,13 @@ RSpec.describe do
 
   describe "logging" do
     it "logs a duplicate for a file that already exists" do
-      Wizard.new.transfer
+      FileUtils.cp(photo_1, target_directory)
       Wizard.new.transfer
 
       Dir.chdir(target_directory)
       log = File.open(log_file).read
-
-      expect(log).to eq "Copied " + photo_1_source_path + " to " + photo_1_target_path + "\n" + "File " + photo_1 + " already exists at " + target_directory + "/" + photo_1 + "\n"
+binding.pry
+      expect(log).to eq "File " + photo_1 + " already exists at " + target_directory + "/" + photo_1 + "\n"
     end
 
     it "logs a success for a transferred file" do
