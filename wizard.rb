@@ -57,28 +57,21 @@ class Wizard
 
   def scan
     Dir.chdir(SOURCE_DIR)
-    records = []
 
-    filter(Dir.children(SOURCE_DIR)).each do |f|
-      records << FileRecord.new(
+    filter(Dir.children(SOURCE_DIR)).map do |f|
+      FileRecord.new(
         name: File.basename(f),
         source_path: File.absolute_path(f),
         target_dir: TARGET_DIR,
         size: File.size(f)
       )
     end
-
-    records
   end
 
   def filter(file_names)
-    filtered_file_names = []
-
-    file_names.each do |file_name|
-      filtered_file_names << file_name if File.extname(file_name) == ".jpg"
-    end
-
-    filtered_file_names
+    file_names.map do |file_name|
+      file_name if File.extname(file_name) == ".jpg"
+    end.compact
   end
 
   def duplicate?(record)
