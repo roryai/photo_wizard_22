@@ -71,12 +71,12 @@ RSpec.describe do
 
   describe "logging" do
     it "logs a duplicate for a file that already exists" do
-      FileUtils.cp(photo_1, target_directory)
+      FileUtils.cp(photo_1_source_path, photo_1_target_path)
       Wizard.new.transfer
 
       Dir.chdir(target_directory)
       log = File.open(log_file).read
-binding.pry
+
       expect(log).to eq "File " + photo_1 + " already exists at " + target_directory + "/" + photo_1 + "\n"
     end
 
@@ -91,17 +91,16 @@ binding.pry
 
   describe "extensions" do
     it "generates a list and count of file extensions for files in source directory" do
-      Dir.chdir(target_directory)
-      File.new("test.jpg", "w")
-      File.new("test.heic", "w")
-      File.new("test_2.heic", "w")
-      File.new("test.mov", "w")
-      File.new("test.custom", "w")
-      File.new("test", "w")
+      files = ["test.heic", "test_2.heic", "test.jpg",
+        "test.mov", "test.custom", "test"]
+      files.each do |file|
+        File.new(target_directory + "/" + file, "w")
+      end
+
       extensions = Wizard.new.list_extensions
 
-      expect(extensions).to include([".jpg", 1], [".heic", 2], [".mov", 1], [".custom", 1], ["", 1])
-      expect(extensions.length).to eq 5
+      expect(extensions).to include([".jpg", 1], [".heic", 2], [".mov", 1], [".custom", 1])
+      expect(extensions.length).to eq 4
     end
   end
 end

@@ -34,24 +34,24 @@ class Wizard
 
   def list_extensions
     files = Dir.children(TARGET_DIR)
-    extension_list = [[".heic", 0]]
+    excluded_extensions = [".txt", ""]
+    extension_records = []
 
     files.each do |f|
       ext = File.extname(f)
-      extension_exists = extension_list.map do |record|
-        record[0] == ext
-      end[0]
 
-      extension_list << [ext, 0] unless extension_exists || ext == ".txt"
-
-      extension_list.each do |record|
-        record[1] += 1 if record[0] == ext
+      if excluded_extensions.include?(ext)
+        next
+      elsif !extension_records.flatten.include?(ext)
+        extension_records << [ext, 1]
+      else
+        record = extension_records.find {|record| record[0] == ext}
+        record[1] += 1
       end
     end
 
-    extension_list
+    extension_records
   end
-
 
   private
 
