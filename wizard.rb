@@ -23,9 +23,9 @@ class Wizard
         next
       elsif name_clash?(record)
         new_path = generate_unique_path(record)
-        FileUtils.cp(record.source_path, new_path)
+        FileUtils.cp(record.source_path, new_path, preserve: true)
       else
-        FileUtils.cp(record.source_path, record.target_path)
+        FileUtils.cp(record.source_path, record.target_path, preserve: true)
       end
 
       log_result(record)

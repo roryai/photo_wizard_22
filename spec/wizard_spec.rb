@@ -16,7 +16,6 @@ RSpec.describe do
       File.delete(file)
     end
 
-    log_file = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target/file_wizard_log.txt"
     File.open(log_file, "w") # wipe_log_file
   end
 
@@ -66,6 +65,15 @@ RSpec.describe do
       expect(File.exist?("small_cat_5.jpg")).to be true
       expect(File.size?("small_cat_5.jpg"))
         .to eq (File.size?(photo_1_source_path))
+    end
+
+    it "preserves creation time of original file" do
+      Wizard.new.transfer
+
+      original_birth_time = File.birthtime(photo_1_source_path).strftime("%Y%m%d")
+      new_birth_time = File.birthtime(photo_1_target_path).strftime("%Y%m%d")
+
+      expect(original_birth_time).to eq new_birth_time
     end
   end
 
