@@ -5,21 +5,32 @@ require_relative "../file_record.rb"
 RSpec.describe do
   photo_1 = "small_cat.jpg"
   source_directory = "/Users/rory/code/transfer_wizard_22/spec/test_photos/source"
-  target_directory = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target"
+  target_directory = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target/2022"
   photo_1_source_path = source_directory + "/" + photo_1
   photo_1_target_path = target_directory + "/" + photo_1
   log_file = target_directory + "/" + "file_wizard_log.txt"
 
   after(:each) do
+    small_cat_2022 = target_directory + "/" + photo_1
+    File.delete(target_directory + "/" + photo_1) if File.exist?(small_cat_2022)
+    dsstore_2022 = target_directory + "/" + ".DS_Store"
+    File.delete(dsstore_2022) if File.exist?(dsstore_2022)
+
+    # binding.pry
+
     Dir.chdir(target_directory)
     Dir.children(target_directory).each do |file|
-      File.delete(file)
+      if File.directory?(file)
+        Dir.delete(file)
+      else
+        File.delete(file)
+      end
     end
 
     File.open(log_file, "w") # wipe_log_file
   end
 
-  describe "transfers" do
+  describe "file transfers" do
     it "copies a jpg to the source directory" do
       Wizard.new.transfer
       Dir.chdir(target_directory)
@@ -74,6 +85,22 @@ RSpec.describe do
       new_birth_time = File.birthtime(photo_1_target_path).strftime("%Y%m%d")
 
       expect(original_birth_time).to eq new_birth_time
+    end
+  end
+
+  describe "copying to new directories" do
+    it "generates a year folder for files to be transferred to" do
+      Wizard.new.transfer
+      Dir.chdir("/Users/rory/code/transfer_wizard_22/spec/test_photos/target")
+
+      expect(Dir.exist?("2022")).to be true
+    end
+
+    it "copies a file to a year directory" do
+      Wizard.new.transfer
+      Dir.chdir(target_directory)
+      
+      expect(File.exist?(photo_1)).to be true
     end
   end
 

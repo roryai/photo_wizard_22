@@ -7,15 +7,23 @@ Copy remaining files to appropriate year dir
 
 How to check all target dir files for duplicates?
 Take command line input
-Terminal output
-Preserve ctime on mac
+Terminal output - progress bar, totals
+Preserve ctime on mac x
+List range of extensions in target dir x
+Sort range of file types
+
+Notes
+record.target_dir never used. Either delete or prefer passing and reading from Record rather than passing
+properties of Record
+
+TO DO
+Extract extension functionality to another class
 
 
 Nice to haves
 
 Add multiple directories
 Recursively look through child directories
-Log duplicate files
-Log copied files
-Change ctime on mac. How? Check logs?
+Log duplicate files x
+Log copied files x
 Delete month directories, keeping everything in year directories

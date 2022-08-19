@@ -23,9 +23,9 @@ class Wizard
         next
       elsif name_clash?(record)
         new_path = generate_unique_path(record)
-        FileUtils.cp(record.source_path, new_path, preserve: true)
+        copy_file(record.source_path, new_path)
       else
-        FileUtils.cp(record.source_path, record.target_path, preserve: true)
+        copy_file(record.source_path, record.target_path)
       end
 
       log_result(record)
@@ -62,7 +62,7 @@ class Wizard
       FileRecord.new(
         name: File.basename(f),
         source_path: File.absolute_path(f),
-        target_dir: TARGET_DIR,
+        target_path: new_target_path(File.absolute_path(f), TARGET_DIR),
         size: File.size(f)
       )
     end
@@ -92,10 +92,11 @@ class Wizard
 
   def generate_unique_path(record)
     new_name = record.name
-    while File.exist?(record.target_dir + "/" + new_name) do
-        new_name = increment(new_name)
+    split = File.split(record.target_path)
+    while File.exist?(split[0] + "/" + new_name) do
+      new_name = increment(new_name)
     end
-    record.target_dir + "/" + new_name
+    split[0] + "/" + new_name
   end
 
   def increment(name)
@@ -113,5 +114,21 @@ class Wizard
     else
       logger.log_failure(record)
     end
+  end
+
+  def copy_file(source_path, target_path)
+    target_dir = File.split(target_path)[0]
+    name = File.split(target_path)[1]
+
+    Dir.mkdir(target_dir) if !Dir.exist?(target_dir)
+    FileUtils.cp(source_path, target_path, preserve: true)
+  end
+
+  def new_target_path(source_path, target_path)
+    year = File.birthtime(source_path).strftime("%Y")
+    filename = File.split(source_path)[1]
+    new_target_path = File.join(target_path, year, filename)
+
+    new_target_path
   end
 end
