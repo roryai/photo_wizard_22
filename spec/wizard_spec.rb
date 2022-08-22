@@ -99,7 +99,7 @@ RSpec.describe do
     it "copies a file to a year directory" do
       Wizard.new.transfer
       Dir.chdir(target_directory)
-      
+
       expect(File.exist?(photo_1)).to be true
     end
   end

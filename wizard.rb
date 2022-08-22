@@ -22,10 +22,10 @@ class Wizard
         logger.log_already_exists(record)
         next
       elsif name_clash?(record)
-        new_path = generate_unique_path(record)
-        copy_file(record.source_path, new_path)
+        record.generate_unique_path
+        copy_file(record)
       else
-        copy_file(record.source_path, record.target_path)
+        copy_file(record)
       end
 
       log_result(record)
@@ -33,7 +33,7 @@ class Wizard
   end
 
   def list_extensions
-    files = Dir.children(TARGET_DIR)
+    files = Dir.children(TARGET_DIR + "/2022") # todo: fix this
     excluded_extensions = [".txt", ""]
     extension_records = []
 
@@ -90,24 +90,6 @@ class Wizard
     File.size(record.target_path) == record.size
   end
 
-  def generate_unique_path(record)
-    new_name = record.name
-    split = File.split(record.target_path)
-    while File.exist?(split[0] + "/" + new_name) do
-      new_name = increment(new_name)
-    end
-    split[0] + "/" + new_name
-  end
-
-  def increment(name)
-    extension = File.extname(name)
-    name_no_ext = File.basename(name, ".*")
-    number = /\d*$/.match(name_no_ext).to_s
-    name_no_num = name_no_ext.chomp(number).chomp("_")
-
-    name_no_num + "_" + (number.to_i + 1).to_s + extension
-  end
-
   def log_result(record)
     if file_exists?(record)
       logger.log_success(record)
@@ -116,12 +98,9 @@ class Wizard
     end
   end
 
-  def copy_file(source_path, target_path)
-    target_dir = File.split(target_path)[0]
-    name = File.split(target_path)[1]
-
-    Dir.mkdir(target_dir) if !Dir.exist?(target_dir)
-    FileUtils.cp(source_path, target_path, preserve: true)
+  def copy_file(record)
+    Dir.mkdir(record.target_dir) if !Dir.exist?(record.target_dir)
+    FileUtils.cp(record.source_path, record.target_path, preserve: true)
   end
 
   def new_target_path(source_path, target_path)
