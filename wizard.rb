@@ -62,7 +62,7 @@ class Wizard
       FileRecord.new(
         name: File.basename(f),
         source_path: File.absolute_path(f),
-        target_path: new_target_path(File.absolute_path(f), TARGET_DIR),
+        root_target_dir: TARGET_DIR,
         size: File.size(f)
       )
     end
@@ -91,6 +91,7 @@ class Wizard
   end
 
   def log_result(record)
+
     if file_exists?(record)
       logger.log_success(record)
     else
@@ -101,13 +102,5 @@ class Wizard
   def copy_file(record)
     Dir.mkdir(record.target_dir) if !Dir.exist?(record.target_dir)
     FileUtils.cp(record.source_path, record.target_path, preserve: true)
-  end
-
-  def new_target_path(source_path, target_path)
-    year = File.birthtime(source_path).strftime("%Y")
-    filename = File.split(source_path)[1]
-    new_target_path = File.join(target_path, year, filename)
-
-    new_target_path
   end
 end
