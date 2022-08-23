@@ -12,11 +12,9 @@ RSpec.describe do
 
   after(:each) do
     small_cat_2022 = target_directory + "/" + photo_1
-    File.delete(target_directory + "/" + photo_1) if File.exist?(small_cat_2022)
+    File.delete(small_cat_2022) if File.exist?(small_cat_2022)
     dsstore_2022 = target_directory + "/" + ".DS_Store"
     File.delete(dsstore_2022) if File.exist?(dsstore_2022)
-
-    # binding.pry
 
     Dir.chdir(target_directory)
     Dir.children(target_directory).each do |file|

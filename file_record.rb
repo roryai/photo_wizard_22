@@ -23,6 +23,8 @@ class FileRecord
     self.target_path = target_dir + "/" + new_name
   end
 
+  private
+
   def increment(name)
     extension = File.extname(name)
     name_no_ext = File.basename(name, ".*")
