@@ -15,9 +15,7 @@ class Wizard
   end
 
   def transfer
-    scan.each do |record|
-      file_name = record.name
-
+    files_to_transfer.each do |record|
       if duplicate?(record)
         logger.log_already_exists(record)
         next
@@ -55,10 +53,11 @@ class Wizard
 
   private
 
-  def scan
+  def files_to_transfer
     Dir.chdir(SOURCE_DIR)
+    all_files = Dir.children(SOURCE_DIR)
 
-    filter(Dir.children(SOURCE_DIR)).map do |f|
+    filter(all_files).map do |f|
       FileRecord.new(
         name: File.basename(f),
         source_path: File.absolute_path(f),
@@ -91,7 +90,6 @@ class Wizard
   end
 
   def log_result(record)
-
     if file_exists?(record)
       logger.log_success(record)
     else
