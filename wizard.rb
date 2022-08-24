@@ -2,6 +2,7 @@ require 'fileutils'
 require 'pry'
 require './file_record.rb'
 require './logger.rb'
+require './extension_manager.rb'
 
 class Wizard
 
@@ -31,24 +32,7 @@ class Wizard
   end
 
   def list_extensions
-    files = Dir.children(TARGET_DIR + "/2022") # todo: fix this
-    excluded_extensions = [".txt", ""]
-    extension_records = []
-
-    files.each do |f|
-      ext = File.extname(f)
-
-      if excluded_extensions.include?(ext)
-        next
-      elsif !extension_records.flatten.include?(ext)
-        extension_records << [ext, 1]
-      else
-        record = extension_records.find {|record| record[0] == ext}
-        record[1] += 1
-      end
-    end
-
-    extension_records
+    ExtensionScanner.list_extensions(TARGET_DIR)
   end
 
   private
