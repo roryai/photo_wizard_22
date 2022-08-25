@@ -1,31 +1,22 @@
 require_relative "spec_helper"
+require 'find'
 require_relative "../wizard.rb"
 require_relative "../file_record.rb"
 
 RSpec.describe do
   photo_1 = "small_cat.jpg"
   source_directory = "/Users/rory/code/transfer_wizard_22/spec/test_photos/source"
+  target_root_directory = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target/"
   target_directory = "/Users/rory/code/transfer_wizard_22/spec/test_photos/target/2022"
   photo_1_source_path = source_directory + "/" + photo_1
   photo_1_target_path = target_directory + "/" + photo_1
   log_file = target_directory + "/" + "file_wizard_log.txt"
 
   after(:each) do
-    small_cat_2022 = target_directory + "/" + photo_1
-    File.delete(small_cat_2022) if File.exist?(small_cat_2022)
-    dsstore_2022 = target_directory + "/" + ".DS_Store"
-    File.delete(dsstore_2022) if File.exist?(dsstore_2022)
-
-    Dir.chdir(target_directory)
-    Dir.children(target_directory).each do |file|
-      if File.directory?(file)
-        Dir.delete(file)
-      else
-        File.delete(file)
-      end
+    Dir.chdir(target_root_directory)
+    Dir.children(target_root_directory).each do |file|
+      FileUtils.rm_rf(file) if File.exists?(file)
     end
-
-    File.open(log_file, "w") # wipe_log_file
   end
 
   describe "file transfers" do
@@ -51,6 +42,7 @@ RSpec.describe do
     end
 
     it "creates new name for files where name in use but size different" do
+      Dir.mkdir(target_directory)
       Dir.chdir(target_directory)
       File.new(photo_1, "w")
       Wizard.new.transfer
@@ -62,6 +54,7 @@ RSpec.describe do
     end
 
     it "creates new name for files where generated file name already in use" do
+      Dir.mkdir(target_directory)
       Dir.chdir(target_directory)
       File.new(photo_1, "w")
       File.new("small_cat_1.jpg", "w")
@@ -104,6 +97,7 @@ RSpec.describe do
 
   describe "logging" do
     it "logs a duplicate for a file that already exists" do
+      Dir.mkdir(target_directory)
       FileUtils.cp(photo_1_source_path, photo_1_target_path)
       Wizard.new.transfer
 
@@ -126,6 +120,8 @@ RSpec.describe do
     it "generates a list and count of file extensions for files in source directory" do
       files = ["test.heic", "test_2.heic", "test.jpg",
         "test.mov", "test.custom", "test"]
+
+      Dir.mkdir(target_directory)
       files.each do |file|
         File.new(target_directory + "/" + file, "w")
       end
